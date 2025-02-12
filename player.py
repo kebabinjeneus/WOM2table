@@ -22,7 +22,6 @@ def getOverview(team):
 	rows = []
 	for p in team:
 		rows.append(getStats(p))
-	print(rows)
 	empty = getEmptyColumns(rows)
 	if len(empty) > 0:
 		for e in range(len(empty),0,-1):
