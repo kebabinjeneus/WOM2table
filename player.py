@@ -20,7 +20,7 @@ def getTeam(players):
 
 # compile the overview from the data in the program
 def getOverview(team):
-	head = ["RSN", "Commitment", "CB", "Tot.", "Type", "Raids", "RaidsCM"]
+	head = ["RSN", "country", "Commitment", "CB", "Tot.", "Type", "Raids", "RaidsCM"]
 	rows = []
 	for p in team:
 		rows.append(getStats(p))
@@ -54,6 +54,14 @@ def checkColumnClear(rows,col):
 		if row[col] != '':
 			return False
 	return True
+
+def checkRaid(player, name, boss):
+    bosses = player[0]["latestSnapshot"]["data"]["bosses"]
+    kc = bosses[boss]["kills"]
+    if kc < 1:
+        return ""
+    else:
+        return name + ": " + str(kc)
 	
 # parse the playerdata to get the stats for the final overview in a neat list
 def getStats(player):
@@ -64,18 +72,20 @@ def getStats(player):
 	# add a bit of readability to the stats list by pre-defining some points in the dictionary
 	skills = player[0]["latestSnapshot"]["data"]["skills"]
 	bosses = player[0]["latestSnapshot"]["data"]["bosses"]
-	raids = bosses["chambers_of_xeric"]["kills"] + bosses["tombs_of_amascut"]["kills"] + bosses["theatre_of_blood"]["kills"]
-	raidsCM = (bosses["chambers_of_xeric_challenge_mode"]["kills"]
-			 +	bosses["tombs_of_amascut_expert"]["kills"] + bosses["theatre_of_blood_hard_mode"]["kills"])
+	raids = checkRaid(player,"cox", "chambers_of_xeric") + checkRaid(player,"\ntoa","tombs_of_amascut") + checkRaid(player,"\ntob","theatre_of_blood")
+	raidsCM = checkRaid(player,"cox", "chambers_of_xeric_challenge_mode") + checkRaid(player,"\ntoa","tombs_of_amascut_expert") + checkRaid(player,"\ntob","theatre_of_blood_hard_mode")
+	#raids = "cox: " + str(bosses["chambers_of_xeric"]["kills"]) + "\ntoa: " + str(bosses["tombs_of_amascut"]["kills"]) + "\ntob: " + str(bosses["theatre_of_blood"]["kills"])
+	#raidsCM = "cox: " + str(bosses["chambers_of_xeric_challenge_mode"]["kills"]) + "\ntoa: " + str(bosses["tombs_of_amascut_expert"]["kills"]) + "\ntob: " + str(bosses["theatre_of_blood_hard_mode"]["kills"])
 
 	# remove empty results from the table
-	if raids < 1:
-		raids = ''
-	if raidsCM < 1:
-		raidsCM = ''
+	#if raids < 1:
+	#	raids = ''
+	#if raidsCM < 1:
+	#	raidsCM = ''
 	
 	stats = [
 		player[0]["username"], 
+        player[0]["country"],
 		commitment,
 		player[0]["combatLevel"],
 		skills["overall"]["level"],
