@@ -6,16 +6,23 @@ from prettytable import PrettyTable
 # loads player data using the WOM API
 def getPlayer(ign):
 	player = json.loads(requests.get("https://api.wiseoldman.net/v2/players/" + ign).text)
+	print(player["username"] + ', ', end='', flush=True)
 	return player
 
 # parse rsn's and commitment (if applicable) from team string and put player data in team list to return
 def getTeam(players):
 	team  = []
 	igns = players.split(",")
-	for x in igns:
-		dat = x.split(".")
+	end = ''
+	print("Loading player: ", end='')
+	for i in range(len(igns)):
+		dat = igns[i].split(".")
+		if i == 20:
+			print('\nWARN: too many api requests, reduced team size from ' + str(len(igns)) + ' to 20 players!\n')
+			break
 		dat[0] = getPlayer(dat[0])
 		team.append(dat)
+	print('')
 	return team
 
 # compile the overview from the data in the program
